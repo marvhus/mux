@@ -2,8 +2,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
-// defs for internal, local_persist, and global_variable
 #include "../include/defs.h"
+#include "./mem.h"
 
 #if defined (__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"
@@ -43,15 +43,6 @@ uint16_t vga_entry(unsigned char uc, uint8_t color) {
     return (uint16_t) uc | (uint16_t) color << 8;
 }
 
-internal
-size_t strlen(const char* str) {
-    size_t len = 0;
-    while (str[len]) {
-        len++;
-    }
-    return len;
-}
-
 global_variable const size_t VGA_WIDTH  = 80;
 global_variable const size_t VGA_HEIGHT = 25;
 
@@ -69,7 +60,18 @@ internal inline
 void terminal_newline() {
     terminal_col = 0;
     if (++terminal_row == VGA_HEIGHT) {
-        terminal_row = 0;
+        // Scroll
+        terminal_row = VGA_HEIGHT - 1;
+        memmove(
+            terminal_buffer,
+            terminal_buffer + terminal_coord_to_index(0, 1),
+            VGA_WIDTH * (VGA_HEIGHT - 1) * sizeof(uint16_t)
+        );
+        memset(
+            terminal_buffer + terminal_coord_to_index(0, VGA_HEIGHT - 1),
+            0,
+            VGA_WIDTH
+        );
     }
 }
 
@@ -130,5 +132,34 @@ void terminal_writestring(const char* data) {
 void kernel_main(void) {
     terminal_initialize();
 
-    terminal_writestring("Hello, Kernel World!\n");
+    terminal_writestring("Hello, Kernel World!  1 \n");
+    terminal_writestring("Hello, Kernel World!  2 \n");
+    terminal_writestring("Hello, Kernel World!  3 \n");
+    terminal_writestring("Hello, Kernel World!  4 \n");
+    terminal_writestring("Hello, Kernel World!  5 \n");
+    terminal_writestring("Hello, Kernel World!  6 \n");
+    terminal_writestring("Hello, Kernel World!  7 \n");
+    terminal_writestring("Hello, Kernel World!  8 \n");
+    terminal_writestring("Hello, Kernel World!  9 \n");
+    terminal_writestring("Hello, Kernel World! 10 \n");
+    terminal_writestring("Hello, Kernel World! 11 \n");
+    terminal_writestring("Hello, Kernel World! 12 \n");
+    terminal_writestring("Hello, Kernel World! 13 \n");
+    terminal_writestring("Hello, Kernel World! 14 \n");
+    terminal_writestring("Hello, Kernel World! 15 \n");
+    terminal_writestring("Hello, Kernel World! 16 \n");
+    terminal_writestring("Hello, Kernel World! 17 \n");
+    terminal_writestring("Hello, Kernel World! 18 \n");
+    terminal_writestring("Hello, Kernel World! 19 \n");
+    terminal_writestring("Hello, Kernel World! 20 \n");
+    terminal_writestring("Hello, Kernel World! 21 \n");
+    terminal_writestring("Hello, Kernel World! 22 \n");
+    terminal_writestring("Hello, Kernel World! 23 \n");
+    terminal_writestring("Hello, Kernel World! 24 \n");
+    terminal_writestring("Hello, Kernel World! 25 \n");
+    terminal_writestring("Hello, Kernel World! 26 \n");
+    terminal_writestring("Hello, Kernel World! 27 \n");
+    terminal_writestring("Hello, Kernel World! 28 \n");
+    terminal_writestring("Hello, Kernel World! 29 \n");
+    terminal_writestring("Hello, Kernel World! 30 \n");
 }

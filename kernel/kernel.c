@@ -70,7 +70,7 @@ void terminal_newline() {
         memset(
             terminal_buffer + terminal_coord_to_index(0, VGA_HEIGHT - 1),
             0,
-            VGA_WIDTH
+            VGA_WIDTH * sizeof(uint16_t)
         );
     }
 }

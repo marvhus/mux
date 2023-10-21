@@ -25,7 +25,13 @@ void kernel_main(u32 multiboot_magic, const struct MultibootInfo* info) {
     terminal_initialize();
 
     terminal_put_hex((u8*) &multiboot_magic, sizeof(u32), true);
-    terminal_putchar('\n');
+    terminal_putchar(' ');
+    terminal_writestring(
+        (multiboot_magic == 0x2BADB002) 
+        ? "VALID"
+        : "INVALID"
+    );
+    terminal_writestring(" multiboot magic\n");
 
     terminal_put_u32(info->flags);
     terminal_putchar('\n');

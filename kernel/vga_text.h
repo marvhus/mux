@@ -126,7 +126,7 @@ u8 int_to_hex_nible(u8 val) {
     return (val - 10) + 'A';
 }
 
-void terminal_put_hex(const u8* bytes, size count, bool prefix) {
+void terminal_put_hex(u8* bytes, size count, bool prefix) {
     if (prefix) {
         terminal_putchar('0');
         terminal_putchar('x');
@@ -160,7 +160,7 @@ void terminal_put_s32(s32 val) {
 }
 
 // @Note has to be null terminated
-void terminal_writestring(const u8* data) {
+void terminal_writestring(u8* data) {
     terminal_write(data, strlen(data));
 }
 

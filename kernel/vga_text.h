@@ -1,9 +1,9 @@
 #if !defined (KERNEL_VGA_TEXT_H)
 #define KERNEL_VGA_TEXT_H
 
-#include <stdint.h>
-
+#include "../include/types.h"
 #include "../include/defs.h"
+#include "./mem.h"
 #include "./math.h"
 
 // VGA Text Mode Stuff
@@ -29,13 +29,13 @@ enum vga_color {
 };
 
 internal inline
-uint8_t vga_entry_color(enum vga_color fg, enum vga_color bg) {
+u8 vga_entry_color(enum vga_color fg, enum vga_color bg) {
     return fg | bg << 4;
 }
 
 internal inline
-uint16_t vga_entry(unsigned char uc, uint8_t color) {
-    return (uint16_t) uc | (uint16_t) color << 8;
+u16 vga_entry(u8 uc, u8 color) {
+    return (u16) uc | (u16) color << 8;
 }
 
 global_variable const size_t VGA_WIDTH  = 80;
@@ -43,13 +43,13 @@ global_variable const size_t VGA_HEIGHT = 25;
 
 // Terminal Stuff
 
-size_t    terminal_row;
-size_t    terminal_col;
-uint8_t   terminal_color;
-uint16_t* terminal_buffer;
+size terminal_row;
+size terminal_col;
+u8   terminal_color;
+u16* terminal_buffer;
 
 internal inline
-size_t terminal_coord_to_index(size_t x, size_t y) {
+size terminal_coord_to_index(size x, size y) {
     return y * VGA_WIDTH + x;
 }
 
@@ -62,10 +62,10 @@ void terminal_newline() {
         memmove(
             terminal_buffer,
             terminal_buffer + terminal_coord_to_index(0, 1),
-            VGA_WIDTH * (VGA_HEIGHT - 1) * sizeof(uint16_t)
+            VGA_WIDTH * (VGA_HEIGHT - 1) * sizeof(u16)
         );
-        uint16_t* offset_buffer = terminal_buffer + terminal_coord_to_index(0, VGA_HEIGHT - 1);
-        for (size_t i = 0; i < VGA_WIDTH; ++i) {
+        u16* offset_buffer = terminal_buffer + terminal_coord_to_index(0, VGA_HEIGHT - 1);
+        for (size i = 0; i < VGA_WIDTH; ++i) {
             offset_buffer[i] = vga_entry(' ', terminal_color);
         }
     }
@@ -82,26 +82,26 @@ void terminal_initialize(void) {
     terminal_row    = 0;
     terminal_col    = 0;
     terminal_color  = vga_entry_color(VGA_COLOR_LIGHT_GREY, VGA_COLOR_BLACK);
-    terminal_buffer = (uint16_t*) 0xB8000;
-    for (size_t y = 0; y < VGA_HEIGHT; ++y) {
-        for (size_t x = 0; x < VGA_WIDTH; ++x) {
-            const size_t index = terminal_coord_to_index(x, y);
+    terminal_buffer = (u16*) 0xB8000;
+    for (size y = 0; y < VGA_HEIGHT; ++y) {
+        for (size x = 0; x < VGA_WIDTH; ++x) {
+            const size index = terminal_coord_to_index(x, y);
             terminal_buffer[index] = vga_entry(' ', terminal_color);
         }
     }
 }
 
 // @Note: is this redundant?
-void terminal_setcolor(uint8_t color) {
+void terminal_setcolor(u8 color) {
     terminal_color = color;
 }
 
-void terminal_putentryat(char c, uint8_t color, size_t x, size_t y) {
-    const size_t index = terminal_coord_to_index(x, y);
+void terminal_putentryat(u8 c, u8 color, size x, size y) {
+    const size index = terminal_coord_to_index(x, y);
     terminal_buffer[index] = vga_entry(c, color);
 }
 
-void terminal_putchar(char c) {
+void terminal_putchar(u8 c) {
     switch (c) {
         case '\n': {
             terminal_newline();
@@ -113,18 +113,32 @@ void terminal_putchar(char c) {
     }
 }
 
-void terminal_write(const char* data, size_t size) {
-    for (size_t i = 0; i < size; ++i) {
+void terminal_write(const u8* data, size count) {
+    for (size i = 0; i < count; ++i) {
         terminal_putchar(data[i]);
     }
 }
 
-void terminal_putint(int32_t val) {
-    if (val < 0) {
-        terminal_putchar('-');
-        val = -val;
-    }
+internal inline
+u8 int_to_hex_nible(u8 val) {
+    val &= 0x0F;
+    if (val < 10) return val + '0';
+    return (val - 10) + 'A';
+}
 
+void terminal_put_hex(const u8* bytes, size count, bool prefix) {
+    if (prefix) {
+        terminal_putchar('0');
+        terminal_putchar('x');
+    }
+    for (size i = count; i > 0; --i) {
+        u8 byte = bytes[i-1];
+        terminal_putchar(int_to_hex_nible(byte >> 4));
+        terminal_putchar(int_to_hex_nible(byte));
+    }
+}
+
+void terminal_put_u32(u32 val) {
     int num_digits = 1;
     while (true) {
         if (val / ipow(10, num_digits) == 0) break;
@@ -132,13 +146,21 @@ void terminal_putint(int32_t val) {
     }
 
     for (int digit = num_digits; digit > 0; --digit) {
-        char c = (val / ipow(10, digit - 1)) % 10;
+        u8 c = (val / ipow(10, digit - 1)) % 10;
         terminal_putchar(c + '0');
     }
 }
 
+void terminal_put_s32(s32 val) {
+    if (val < 0) {
+        terminal_putchar('-');
+        val = -val;
+    }
+    terminal_put_u32((u32) val);
+}
+
 // @Note has to be null terminated
-void terminal_writestring(const char* data) {
+void terminal_writestring(const u8* data) {
     terminal_write(data, strlen(data));
 }
 

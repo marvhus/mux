@@ -85,47 +85,47 @@ struct Multiboot_Info {
 
 // MultibootInfo Framebuffer Type
 enum Framebuffer_Type {
-    Indexed = 0,
-    RGB = 1,
-    EGA_Text = 2,
+    FRAME_BUFFER_Indexed  = 0,
+    FRAME_BUFFER_RGB      = 1,
+    FRAME_BUFFER_EGA_Text = 2,
 };
 
 // MultibootInfo Flags
 enum Multiboot_Info_Flag {
     // is there basic lower/upper memory information?
-    Memory = 0x00000001,
+    MULTIBOOT_INFO_Memory = 0x00000001,
     // is there a boot device set?
-    Boot_Device = 0x00000002,
+    MULTIBOOT_INFO_Boot_Device = 0x00000002,
     // is the command-line defined?
-    CMD_Line = 0x00000004,
+    MULTIBOOT_INFO_CMD_Line = 0x00000004,
     // are there modules to do something with?
-    Modules = 0x00000008,
+    MULTIBOOT_INFO_Modules = 0x00000008,
 
     // These next two are mutually exclusive
 
     // is there a symbol table loaded?
-    AOUT_Symbol_Table = 0x00000010,
+    MULTIBOOT_INFO_AOUT_Symbol_Table = 0x00000010,
     // is there an ELF section header table?
-    ELF_Section_Header_Table = 0X00000020,
+    MULTIBOOT_INFO_ELF_Section_Header_Table = 0X00000020,
 
     // is there a full memory map?
-    Memory_Map = 0x00000040,
+    MULTIBOOT_INFO_Memory_Map = 0x00000040,
 
     // Is there drive info?
-    Drive_Info = 0x00000080,
+    MULTIBOOT_INFO_Drive_Info = 0x00000080,
 
     // Is there a config table?
-    Config_Table = 0x00000100,
+    MULTIBOOT_INFO_Config_Table = 0x00000100,
 
     // Is there a boot loader name?
-    Boot_Loader_Name = 0x00000200,
+    MULTIBOOT_INFO_Boot_Loader_Name = 0x00000200,
 
     // Is there a APM table?
-    APM_Table = 0x00000400,
+    MULTIBOOT_INFO_APM_Table = 0x00000400,
 
     // Is there video information?
-    VBE_Info = 0x00000800,
-    Framebuffer_Info = 0x00001000,
+    MULTIBOOT_INFO_VBE_Info = 0x00000800,
+    MULTIBOOT_INFO_Framebuffer_Info = 0x00001000,
 };
 
 #endif // KERNEL_MULTIBOOT_H

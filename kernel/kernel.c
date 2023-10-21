@@ -30,7 +30,7 @@ void check_multiboot_magic(u32 multiboot_magic) {
 
 internal
 void check_boot_loader_name(const struct Multiboot_Info* info) {
-    if (info->flags & Boot_Loader_Name) {
+    if (info->flags & MULTIBOOT_INFO_Boot_Loader_Name) {
         terminal_writestring((u8*) "Has Name: '");
         terminal_writestring((u8*) info->boot_loader_name);
         terminal_writestring((u8*) "'\n");

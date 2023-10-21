@@ -67,11 +67,10 @@ void terminal_newline() {
             terminal_buffer + terminal_coord_to_index(0, 1),
             VGA_WIDTH * (VGA_HEIGHT - 1) * sizeof(uint16_t)
         );
-        memset(
-            terminal_buffer + terminal_coord_to_index(0, VGA_HEIGHT - 1),
-            0,
-            VGA_WIDTH * sizeof(uint16_t)
-        );
+        uint16_t* offset_buffer = terminal_buffer + terminal_coord_to_index(0, VGA_HEIGHT - 1);
+        for (int i = 0; i < VGA_WIDTH; ++i) {
+            offset_buffer[i] = vga_entry(' ', terminal_color);
+        }
     }
 }
 

@@ -10,6 +10,7 @@ void memmove(void* dest, const void* src, size_t count) {
     }
 }
 
+// @TODO: figure out a solution for situations where the values are larger than a byte.
 void memset(void* dest, uint8_t val, size_t count) {
     for (size_t i = 0; i < count; ++i) {
         ((uint8_t*) dest)[i] = val;

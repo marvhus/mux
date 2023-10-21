@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #include "../include/defs.h"
+#include "./math.h"
 
 // VGA Text Mode Stuff
 
@@ -101,21 +102,38 @@ void terminal_putentryat(char c, uint8_t color, size_t x, size_t y) {
 }
 
 void terminal_putchar(char c) {
-    terminal_putentryat(c, terminal_color, terminal_col, terminal_row);
-    terminal_newcol();
+    switch (c) {
+        case '\n': {
+            terminal_newline();
+        } break;
+        default: {
+            terminal_putentryat(c, terminal_color, terminal_col, terminal_row);
+            terminal_newcol();
+        } break;
+    }
 }
 
 void terminal_write(const char* data, size_t size) {
     for (size_t i = 0; i < size; ++i) {
-        char c = data[i];
-        switch (c) {
-            case '\n': {
-                terminal_newline();
-            } break;
-            default: {
-                terminal_putchar(data[i]);
-            } break;
-        }
+        terminal_putchar(data[i]);
+    }
+}
+
+void terminal_putint(int32_t val) {
+    if (val < 0) {
+        terminal_putchar('-');
+        val = -val;
+    }
+
+    int num_digits = 1;
+    while (true) {
+        if (val / ipow(10, num_digits) == 0) break;
+        num_digits++;
+    }
+
+    for (int digit = num_digits; digit > 0; --digit) {
+        char c = (val / ipow(10, digit - 1)) % 10;
+        terminal_putchar(c + '0');
     }
 }
 

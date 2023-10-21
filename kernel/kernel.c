@@ -5,7 +5,6 @@
 #include "../include/defs.h"
 #include "./mem.h"
 #include "./vga_text.h"
-#include "./terminal.h"
 
 #if defined (__linux__)
 #error "You are not using a cross-compiler, you will most certainly run into trouble"

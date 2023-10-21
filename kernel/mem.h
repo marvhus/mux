@@ -17,7 +17,7 @@ void memset(void* dest, u8 val, size count) {
     }
 }
 
-size strlen(const u8* str) {
+size strlen(const char* str) {
     size len = 0;
     while (str[len]) {
         len++;

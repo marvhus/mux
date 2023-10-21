@@ -128,4 +128,19 @@ enum Multiboot_Info_Flag {
     MULTIBOOT_INFO_Framebuffer_Info = 0x00001000,
 };
 
+struct Multiboot_Memory_Map {
+    u32 size;
+    u64 addr;
+    u64 len;
+    u32 type; // enum Multiboot_Memory_Map_Type
+} __attribute__((packed));
+
+enum Multiboot_Memory_Map_Type {
+    MULTIBOOT_MEMORY_Availiable       = 1,
+    MULTIBOOT_MEMORY_Reserved         = 2,
+    MULTIBOOT_MEMORY_ACPI_Reclaimable = 3,
+    MULTIBOOT_MEMORY_NVS              = 4,
+    MULTIBOOT_MEMORY_Bad_Ram          = 5,
+};
+
 #endif // KERNEL_MULTIBOOT_H

@@ -10,7 +10,7 @@ all: boot/myos.bin
 # Compile asm part of boot
 bin/boot.o: $(BOOT_SOURCE) ;
 	mkdir -p bin
-	$(AS) $(BOOT_SOURCE) -o bin/boot.o
+	$(CC) -c $(BOOT_SOURCE) -o bin/boot.o -ggdb
 
 # Compile c part of kernel
 bin/kernel.o: $(KERNEL_SOURCE) ;

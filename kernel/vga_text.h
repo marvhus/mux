@@ -159,7 +159,7 @@ void terminal_put_hex(const u8* bytes, size count, bool prefix) {
             terminal_putchar('-');                         \
             val = -val;                                    \
         }                                                  \
-        int num_digits = 0;                                \
+        int num_digits = 1;                                \
         while (true) {                                     \
             if (val / ipow(10, num_digits) == 0) break;    \
             num_digits++;                                  \
@@ -182,78 +182,80 @@ void terminal_writestring(const char* data) {
     terminal_write(data, strlen(data));
 }
 
-void printf(const char* data, ...) {
+int _printf_hex(char* data, va_list* ptr) {
+    switch (data[2]) {
+        case '3': { // 32
+            u32 val = va_arg(*ptr, u32);
+            terminal_put_hex((u8*) &val, sizeof(val), true);
+        } return 2;
+        case '6': { // 64
+            u64 val = va_arg(*ptr, u64);
+            terminal_put_hex((u8*) &val, sizeof(val), true);
+        } return 2;
+    }
+    return 0;
+}
+
+int _printf_int(char* data, va_list* ptr) {
+    switch (data[2]) { // next next char
+        case 's': { // signed
+            switch (data[3]) {
+                case '3': { // 32
+                    terminal_put_s32(va_arg(*ptr, s32));
+                } return 3;
+                case '6': { // 64
+                    terminal_put_s64(va_arg(*ptr, s64));
+                } return 3;
+            }
+        } break;
+        case 'u': { // unsigned
+            switch (data[3]) {
+                case '3': { // 32
+                    terminal_put_u32(va_arg(*ptr, u32));
+                } return 3;
+                case '6': { // 64
+                    terminal_put_u64(va_arg(*ptr, u64));
+                } return 3;
+            }
+        } break;
+    }
+    return 0;
+}
+
+void printf(char* data, ...) {
     va_list ptr;
     va_start(ptr, data);
 
-    for (int i = 0; data[i] != '\0'; ++i) {
-        char c = data[i];
+    char* backup = data;
+
+    for (; *data != '\0'; ++data) {
+        char c = *data;
 
         if (c == '%') {
-            switch (data[i+1]) { // next char
+            switch (data[1]) {
                 case 'x': { // print as hex
-                    switch (data[i+2]) {
-                        case '3': { // 32
-                            u32 val = va_arg(ptr, u32);
-                            terminal_put_hex((u8*) &val, 4, true);
-                            i += 2;
-                        } break;
-                        case '6': { // 64
-                            u64 val = va_arg(ptr, u32);
-                            terminal_put_hex((u8*) &val, 8, true);
-                            i += 2;
-                        } break;
-                    }
+                    data += _printf_hex(data, &ptr);
                 } break;
                 case 'd': { // print integer
-                    switch (data[i+2]) { // next next char
-                        case 's': { // signed
-                            switch (data[i+3]) {
-                                case '3': { // 32
-                                    s32 val = va_arg(ptr, s32);
-                                    terminal_put_s32(val);
-                                    i += 3;
-                                }; break;
-                                case '6': { // 64
-                                    s64 val = va_arg(ptr, s64);
-                                    terminal_put_s64(val);
-                                    i += 3;
-                                } break;
-                            }
-                        } break;
-                        case 'u': { // unsigned
-                            switch (data[i+3]) {
-                                case '3': { // 32
-                                    u32 val = va_arg(ptr, u32);
-                                    terminal_put_u32(val);
-                                    i += 3;
-                                } break;
-                                case '6': { // 64
-                                    u64 val = va_arg(ptr, u64);
-                                    terminal_put_u64(val);
-                                    i += 3;
-                                } break;
-                            }
-                        } break;
-                    }
+                    data += _printf_int(data, &ptr);
                 } break;
                 case 's': { // print c string
-                    const char* val = va_arg(ptr, const char*);
-                    terminal_writestring(val);
-                    i += 1;
+                    terminal_writestring(va_arg(ptr, const char*));
+                    data += 1;
                 } break;
                 case 'c': { // print char
-                    u8 val = va_arg(ptr, int);
-                    terminal_putchar(val);
-                    i += 3;
+                    terminal_putchar(va_arg(ptr, int));
+                    data += 1;
                 } break;
             }
-        } else {
-            terminal_putchar(c);
+            continue;
         }
+
+        terminal_putchar(c);
     }
 
     va_end(ptr);
+    data = backup;
 }
 
 

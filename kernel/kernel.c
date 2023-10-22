@@ -44,7 +44,8 @@ void kernel_main(u32 multiboot_magic, const struct Multiboot_Info* info) {
 
     for (u32 i = 0; i < info->mmap_length; i += sizeof(struct Multiboot_Memory_Map)) {
         struct Multiboot_Memory_Map* mmap = (struct Multiboot_Memory_Map*) (info->mmap_addr + i);
-        printf("entry: \n| Start Addr: %x6 | Length: %x6 \n| Size: %x6 | Type: %du3\n",
+        printf("entry: | Start Addr: %x6 | Length: %x6 \n"
+               "       | Size:       %x6 | Type:   %du3\n",
             mmap->addr, mmap->len, mmap->size, mmap->type
         );
     }

@@ -15,7 +15,7 @@ bin/boot.o: $(BOOT_SOURCE) ;
 # Compile c part of kernel
 bin/kernel.o: $(KERNEL_SOURCE) ;
 	mkdir -p bin
-	$(CC) -c $(KERNEL_SOURCE) -o bin/kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra
+	$(CC) -c $(KERNEL_SOURCE) -o bin/kernel.o -std=gnu99 -ffreestanding -O2 -Wall -Wextra -ggdb
 
 # Create kernel binary
 boot/myos.bin: bin/kernel.o bin/boot.o ;
@@ -41,6 +41,20 @@ iso: boot/myos.iso
 # Run qemu using kernel binary
 run: boot/myos.bin ;
 	qemu-system-i386 -kernel boot/myos.bin
+
+
+# Run qemu using kernel binary with gdb
+run-gdb: boot/myos.bin ;
+	@echo "============================== GDB =============================="
+	@echo "  You can run gdb using 'gdb ./boot/myos.bin'"
+	@echo "  Then inside gdb do 'target remote localhost:1234'"
+	@echo "  Then to break for example at kernel_main you can do 'b kernel_main'"
+	@echo "  To then start you can do 'c'"
+	@echo "  Then to step-in you can type 's', to step-over you can type 'n'"
+	@echo "  If you want to watch a variable you can do 'display <variable name>'"
+	@echo "  If you want to see the source code you can do 'tui layout src'"
+	@echo "================================================================="
+	qemu-system-i386 -s -S -kernel boot/myos.bin
 
 
 # Run qemu using iso file

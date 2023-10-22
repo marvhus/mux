@@ -50,6 +50,7 @@ void print_mmap_entries(struct Multiboot_Memory_Map* entries, u32 count) {
 
 void kernel_main(u32 multiboot_magic, const struct Multiboot_Info* info) {
     terminal_initialize();
+
     check_multiboot_magic(multiboot_magic);
     check_boot_loader_name(info);
     print_mmap_entries(

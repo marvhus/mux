@@ -37,16 +37,23 @@ void check_boot_loader_name(const struct Multiboot_Info* info) {
     }
 }
 
+internal
+void print_mmap_entries(struct Multiboot_Memory_Map* entries, u32 count) {
+    for (u32 i = 0; i < count; ++i) {
+        struct Multiboot_Memory_Map entry = entries[i];
+        printf("entry: | Start Addr: %x6 | Length: %x6 \n"
+               "       | Size: %du3 | Type:   %du3\n",
+            entry.addr, entry.len, entry.size, entry.type
+        );
+    }
+}
+
 void kernel_main(u32 multiboot_magic, const struct Multiboot_Info* info) {
     terminal_initialize();
     check_multiboot_magic(multiboot_magic);
     check_boot_loader_name(info);
-
-    for (u32 i = 0; i < info->mmap_length; i += sizeof(struct Multiboot_Memory_Map)) {
-        struct Multiboot_Memory_Map* mmap = (struct Multiboot_Memory_Map*) (info->mmap_addr + i);
-        printf("entry: | Start Addr: %x6 | Length: %x6 \n"
-               "       | Size: %du3 | Type:   %du3\n",
-            mmap->addr, mmap->len, mmap->size, mmap->type
-        );
-    }
+    print_mmap_entries(
+        (struct Multiboot_Memory_Map*) info->mmap_addr,
+        info->mmap_length / sizeof(struct Multiboot_Memory_Map)
+    );
 }

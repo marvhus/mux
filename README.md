@@ -5,15 +5,14 @@ though it also includes some of my own stuff.
 Aditionally there are parts that may come from/are inspired by stuff in this OS development
 [playlist](https://www.youtube.com/playlist?list=PL980gcR1LE3LBuWuSv2CL28HsfnpC4Qf7)  
 
-## Running it
-you can compile and run it in qemu using
-```sh
-make run
+# Dependencies
+I made this on Arch linux so if you use a different linux distrobution,
+or maybe even a different operating system, this may differ for you.
+
+If you have yay, this command should get you what you need.
 ```
+yay -S i686-elf-gcc grub libisoburn qemu-base rustup
+```
+(To make the compiling of gcc go faster, you can set the MAKEFLAGS, for example: `MAKEFLAGS=-j5`)
 
-Though you will need a cross compiler for i686-elf.  
-Here is a [guide](https://wiki.osdev.org/GCC_Cross-Compiler) on how to get one.  
-
-
-If you want to only build it, make an iso, etc, you can look inside the makefile.  
-It should be relatively straght forward to see what else you can do.  
+You should also have cargo installed. And you might have to install nightly

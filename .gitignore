@@ -1,3 +1,4 @@
-bin/
-boot/
+*.iso
+*.bin
 isodir/
+target/

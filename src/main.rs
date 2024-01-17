@@ -20,23 +20,29 @@ mod multiboot;
 use multiboot::MultibootInfo;
 
 #[no_mangle]
-pub unsafe extern "C" fn kernel_main(
-    multiboot_magic: u32,
-    multiboot_header: *const MultibootInfo,
+pub extern "C" fn kernel_main(
+    magic: u32,
+    _info: *const MultibootInfo,
 ) -> ! {
     let mut writer = TerminalWriter::new();
+    let info: MultibootInfo = unsafe { *_info };
 
     writer.write(b"Magic: ");
-    writer.printhex(multiboot_magic);
-    writer.newline();
+    writer.printhex(magic);
+    writer.putchar(b'\n');
 
     writer.write(b"Mem Lower: ");
-    writer.printint((*multiboot_header).mem_lower);
-    writer.newline();
+    writer.printint(info.mem_lower);
+    writer.putchar(b'\n');
 
     writer.write(b"Mem Upper: ");
-    writer.printint((*multiboot_header).mem_upper);
-    writer.newline();
+    writer.printint(info.mem_upper);
+    writer.putchar(b'\n');
+
+    writer.write(b"Boot Loader: ");
+    writer.write(unsafe {
+        core::slice::from_raw_parts(info.boot_loader_name, 4)
+    });
 
     loop {}
 }
@@ -59,10 +65,26 @@ fn panic(info: &PanicInfo) -> ! {
 }
 
 #[no_mangle]
-pub unsafe extern "C" fn memset(s: *mut u8, c: i32, n: usize) -> *mut u8 {
-    let c = c as u8;
+pub unsafe extern "C" fn memset(
+    dest: *mut u8,
+    val: i32,
+    n: usize,
+) -> *mut u8 {
+    let val = val as u8;
     for i in 0..n {
-        *s.add(i) = c;
+        *dest.add(i) = val;
     }
-    s
+    dest
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn memcpy(
+    dest: *mut u8,
+    src: *const u8,
+    n: usize,
+) -> *mut u8 {
+    for i in 0..n {
+        *dest.add(i) = *src.add(i);
+    }
+    dest
 }

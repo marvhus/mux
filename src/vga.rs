@@ -99,6 +99,11 @@ impl TerminalWriter {
     }
 
     pub fn putchar(&mut self, c: u8) {
+        if c == b'\n' {
+            self.newline();
+            return;
+        }
+
         self.putentryat(c, self.color, self.col, self.row);
         self.col += 1;
         if self.col == VGA_WIDTH {

@@ -70,7 +70,37 @@ impl TerminalWriter {
         }
     }
 
-    fn putchar(&mut self, c: u8) {
+    #[allow(dead_code)]
+    pub fn printint(&mut self, val: u32) {
+        let mut num_digits: u32 = 1;
+        loop {
+            if val / num_digits.pow(10) == 0 { break; }
+            num_digits += 1;
+        }
+        for digit in (1..=num_digits).rev() {
+            let digit_offset = (digit - 1).pow(10);
+            if digit_offset == 0 { continue; } // We shall not have a division by zero.
+            let char = (val / digit_offset) % 10;
+            self.putchar(char as u8 + b'0');
+        }
+    }
+
+    #[allow(dead_code)]
+    pub fn printhex(&mut self, val: u32) {
+        const HEX_CHARS: [u8;16] = [
+            b'0', b'1', b'2', b'3', b'4', b'5', b'6', b'7', b'8', b'9',
+            b'A', b'B', b'C', b'D', b'E', b'F'
+        ];
+        for bytes in (0..4).rev() {
+            let byte: u8 = ((val >> (bytes * 8)) & 0xFF) as u8;
+            let lower: u8 = byte & 0xF;
+            let upper: u8 = byte >> 4;
+            self.putchar(HEX_CHARS[upper as usize]);
+            self.putchar(HEX_CHARS[lower as usize]);
+        }
+    }
+
+    pub fn putchar(&mut self, c: u8) {
         self.putentryat(c, self.color, self.col, self.row);
         self.col += 1;
         if self.col == VGA_WIDTH {
@@ -85,6 +115,15 @@ impl TerminalWriter {
     pub fn write(&mut self, data: &[u8]) {
         for c in data {
             self.putchar(*c);
+        }
+    }
+
+    #[allow(dead_code)]
+    pub fn newline(&mut self) {
+        self.col = 0;
+        self.row += 1;
+        if self.row == VGA_HEIGHT {
+            self.row = 0;
         }
     }
 }

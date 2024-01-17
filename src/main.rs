@@ -5,7 +5,7 @@
 use core::arch::global_asm;
 use core::panic::PanicInfo;
 
-mod vga;
+//extern crate alloc;
 
 // Include boot.s which defines _start as inline assembly in main. This
 // allows us to do more fine grained setup than if we used a naked _start
@@ -13,15 +13,48 @@ mod vga;
 // inline asm, but this seems much more straight forward.
 global_asm!(include_str!("boot.s"));
 
+mod vga;
+use vga::TerminalWriter;
+
+mod multiboot;
+use multiboot::MultibootInfo;
+
 #[no_mangle]
-pub extern "C" fn kernel_main() -> ! {
-    let mut writer = vga::TerminalWriter::new();
-    writer.write(b"Hello, Kernel!");
+pub unsafe extern "C" fn kernel_main(
+    multiboot_magic: u32,
+    multiboot_header: *const MultibootInfo,
+) -> ! {
+    let mut writer = TerminalWriter::new();
+
+    writer.write(b"Magic: ");
+    writer.printhex(multiboot_magic);
+    writer.newline();
+
+    writer.write(b"Mem Lower: ");
+    writer.printint((*multiboot_header).mem_lower);
+    writer.newline();
+
+    writer.write(b"Mem Upper: ");
+    writer.printint((*multiboot_header).mem_upper);
+    writer.newline();
+
     loop {}
 }
 
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
+fn panic(info: &PanicInfo) -> ! {
+    let mut writer = TerminalWriter::new();
+    writer.write(b"PANIC!");
+    writer.newline();
+    if let Some(location) = info.location() {
+        writer.write(location.file().as_bytes());
+        writer.write(b":");
+        writer.printhex(location.line());
+        writer.write(b":");
+        writer.printhex(location.column());
+    } else {
+        writer.write(b"At unknown location")
+    }
     loop {}
 }
 

@@ -41,6 +41,7 @@ pub struct MultibootInfo {
 
 #[repr(C, packed)]
 #[allow(unused)]
+#[derive(Copy, Clone)]
 pub struct MultibootMmapEntry {
     pub size: u32,
     pub addr: u64,

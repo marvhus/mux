@@ -17,7 +17,7 @@ mod vga;
 use vga::TerminalWriter;
 
 mod multiboot;
-use multiboot::MultibootInfo;
+use multiboot::{MultibootInfo, MultibootMmapEntry};
 
 #[no_mangle]
 pub extern "C" fn kernel_main(
@@ -43,6 +43,27 @@ pub extern "C" fn kernel_main(
     writer.write(unsafe {
         core::slice::from_raw_parts(info.boot_loader_name, 4)
     });
+    writer.putchar(b'\n');
+
+    if false {
+    for i in 0..info.mmap_length {
+        let entry: MultibootMmapEntry = unsafe {
+            *(
+                (info.mmap_addr + core::mem::size_of::<MultibootMmapEntry>() as u32 * i)
+                as *const MultibootMmapEntry
+            )
+        };
+        writer.write(b"len: ");
+        writer.put_u64(entry.len);
+        writer.write(b" addr: ");
+        writer.put_u64(entry.addr);
+        writer.putchar(b'\n');
+    }
+    }
+
+    writer.write(b"mmap entries: ");
+    writer.printint(info.mmap_length);
+    writer.putchar(b'\n');
 
     loop {}
 }

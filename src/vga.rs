@@ -84,6 +84,19 @@ impl TerminalWriter {
     }
 
     #[allow(dead_code)]
+    pub fn put_u64(&mut self, val: u64) {
+        let mut num_digits: u32 = 1;
+        loop {
+            if val / 10_u64.pow(num_digits) == 0 { break; }
+            num_digits += 1;
+        }
+        for digit in (1..=num_digits).rev() {
+            let char = (val / 10_u64.pow(digit - 1)) % 10;
+            self.putchar(char as u8 + b'0');
+        }
+    }
+
+    #[allow(dead_code)]
     pub fn printhex(&mut self, val: u32) {
         const HEX_CHARS: [u8;16] = [
             b'0', b'1', b'2', b'3', b'4', b'5', b'6', b'7', b'8', b'9',

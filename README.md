@@ -16,3 +16,13 @@ yay -S i686-elf-gcc grub libisoburn qemu-base rustup
 (To make the compiling of gcc go faster, you can set the MAKEFLAGS, for example: `MAKEFLAGS=-j5`)
 
 You should also have cargo installed. And you might have to install nightly
+
+# Build
+you can build it using the script `build.sh`
+
+# Run
+you can run it in qemu using the script `run.sh`
+
+# Screenshots
+Some screenshots.
+![Hello Kernel](pictures/hello-kernel.png)

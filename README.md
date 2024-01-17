@@ -26,3 +26,4 @@ you can run it in qemu using the script `run.sh`
 # Screenshots
 Some screenshots.
 ![Hello Kernel](pictures/hello-kernel.png)
+![Multiboot Info](pictures/multiboot-info.png)

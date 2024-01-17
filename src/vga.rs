@@ -74,13 +74,11 @@ impl TerminalWriter {
     pub fn printint(&mut self, val: u32) {
         let mut num_digits: u32 = 1;
         loop {
-            if val / num_digits.pow(10) == 0 { break; }
+            if val / 10_u32.pow(num_digits) == 0 { break; }
             num_digits += 1;
         }
         for digit in (1..=num_digits).rev() {
-            let digit_offset = (digit - 1).pow(10);
-            if digit_offset == 0 { continue; } // We shall not have a division by zero.
-            let char = (val / digit_offset) % 10;
+            let char = (val / 10_u32.pow(digit - 1)) % 10;
             self.putchar(char as u8 + b'0');
         }
     }

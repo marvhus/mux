@@ -1,4 +1,5 @@
 #![allow(bad_asm_style)]
+#![feature(panic_info_message)]
 #![no_std] // don't link the Rust standard library
 #![no_main] // disable all Rust-level entry points
 
@@ -6,16 +7,21 @@
 mod vga;
 mod libc;
 mod multiboot;
+mod allocator;
 
 use multiboot::MultibootInfo;
 use vga::TerminalWriter;
+use allocator::Allocator;
 
 use core::{
     arch::global_asm,
     panic::PanicInfo
 };
 
-//extern crate alloc;
+extern crate alloc;
+
+#[global_allocator]
+static ALLOC: Allocator = Allocator::new();
 
 // Include boot.s which defines _start as inline assembly in main. This
 // allows us to do more fine grained setup than if we used a naked _start
@@ -35,12 +41,15 @@ pub extern "C" fn kernel_main(
         multiboot::print_mmap_sections(info);
     }
 
+    let mut v = alloc::vec::Vec::new();
+    v.push(1);
+
     0
 }
 
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    println!("PANIC!");
+    print!("KERNEL PANIC! At: ");
     if let Some(location) = info.location() {
         println!("{}:{}:{}",
             location.file(),
@@ -48,7 +57,12 @@ fn panic(info: &PanicInfo) -> ! {
             location.column()
         );
     } else {
-        println!("At unknown location");
+        println!("unknown location");
     }
+
+    if let Some(msg) = info.message() {
+        println!("Message: {:?}", msg);
+    }
+
     loop {}
 }

@@ -44,7 +44,27 @@ pub struct MultibootInfo {
 #[derive(Copy, Clone)]
 pub struct MultibootMmapEntry {
     pub size: u32,
-    pub addr: u64,
-    pub len: u64,
+    pub addr_low: u32,
+    pub addr_high: u32,
+    pub len_low: u32,
+    pub len_high: u32,
     pub typ: u32,
+}
+
+pub unsafe fn print_mmap_sections(
+    info: *const MultibootInfo,
+) {
+    let mmap_length = (*info).mmap_length;
+    println!("Available memory segments...");
+    println!("mmap_length: {}", mmap_length);
+    for i in 0..(*info).mmap_length {
+        let entry = ((*info).mmap_addr + core::mem::size_of::<MultibootMmapEntry>() as u32 * i)
+            as *const MultibootMmapEntry;
+        let len = (*entry).len_low;
+        let size = (*entry).size;
+        if size == 0 { break; }
+        let addr = (*entry).addr_low;
+        println!("size: {}, len: {}, addr: {}", size, len, addr);
+    }
+
 }

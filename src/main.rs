@@ -25,12 +25,12 @@ global_asm!(include_str!("boot.s"));
 
 #[no_mangle]
 pub extern "C" fn kernel_main(
-    _magic: u32,
+    magic: u32,
     info: *const MultibootInfo,
 ) -> i32 {
     TerminalWriter::init();
 
-//    println!("Magic: {:#x}", magic);
+    println!("Magic: {:#x}", magic);
     unsafe {
         multiboot::print_mmap_sections(info);
     }
@@ -39,8 +39,7 @@ pub extern "C" fn kernel_main(
 }
 
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-/*
+fn panic(info: &PanicInfo) -> ! {
     println!("PANIC!");
     if let Some(location) = info.location() {
         println!("{}:{}:{}",
@@ -51,6 +50,5 @@ fn panic(_info: &PanicInfo) -> ! {
     } else {
         println!("At unknown location");
     }
-*/
     loop {}
 }

@@ -101,7 +101,7 @@ pub struct TerminalWriter {
     pub color: AtomicU8,
     pub buffer: *mut u16,
 }
-
+unsafe impl Sync for TerminalWriter {}
 impl TerminalWriter {
     const fn new() -> TerminalWriter {
         let row = AtomicUsize::new(0);
@@ -176,5 +176,3 @@ impl Write for TerminalWriter {
         Ok(())
     }
 }
-
-unsafe impl Sync for TerminalWriter {}
